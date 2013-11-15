@@ -918,7 +918,7 @@ void controlEvent(ControlEvent ev)
         }
         else
         {
-          PFont font=createFont("data"+sPathSeparator+"VeraMono.ttf", fontSize);
+          PFont font=createFont("data"+sPathSeparator+"font"+sPathSeparator+"VeraMono.ttf", fontSize);
           cf1 = new ControlFont(font);
         }
         cp5.setControlFont(cf1);
