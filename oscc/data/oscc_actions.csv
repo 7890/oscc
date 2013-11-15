@@ -1,0 +1,55 @@
+#configuration file for OSC_CONSOLE
+#entries share the following syntax:
+#pattern;action;passparams
+
+#hash and semicolon are comment characters
+
+#action will be called with 
+#/bin/sh (unix compat.) or cmd.exe (windows)
+
+#params:
+#select which params to pass to action with bitmask
+#00 or empty: no params are passed
+#first bit: oscpattern and ip address and port of sender
+#second bit: available osc arguments
+#10: oscpattern, from-ip, from-port (i.e. /bus1/test1 /10.10.10.38 1234)
+#01: all arguments (i.e. 42 "hello world" 14.3)
+#11: everything in the order 
+#/my/oscpattern, from-ip, from-port, arg1, arg2, ...
+
+#if action is a script, it must have executable flag set
+#chmod 775 /tmp/my.sh
+#scrtpt uri should be fully qualified starting with /..
+#or c:\ respectively
+
+;/bus1/test1;/tmp/my.sh;01
+;/bus1/test2;/tmp/my.sh;10
+
+#regular expression support to match osc pattern:
+#  *: match anything
+#  +: match anything up to next /
+#  ?: match any single char
+#  #: match any sequence of digits
+#  examples: 
+#  /hell* would match /hello, /helloworld,
+#  /hello/world/xyz etc.
+#  /hell+ would match /hello, /helluva, etc.
+#  /a/+ would match /a/b, /a/xyz etc.
+#  /a/+/c would match /a/b/c, /a/xyz/c, etc.
+#  /a/*/c would match /a/b/c, /a/x/y/z/c etc.
+#  /#/+/? would match /123/anything/a, /1/a/b etc.
+
+;/a+/b+;/tmp/my.sh;11
+;/#/?/+/*;/tmp/my.sh;11
+;/start/prog;notepad.exe;01
+;/hello/mac;open /Applications/TextEdit.app;00
+;/gugus;oscsend localhost 10001 /foo i 42;00
+
+;/ping;/tmp/non-existing.sh;11
+/ping;send_pong_to();10
+
+/test;t1();00
+/test;t2();01
+/test;t3();10
+/test;t4();11
+/test;t5();00

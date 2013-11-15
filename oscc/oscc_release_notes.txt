@@ -1,0 +1,108 @@
+oscc (OSC Console) Release History
+
+20131115
+v0.7          clean up oscc to release on github
+              change (sketch) name from OSC_CONSOLE to oscc
+              (legacy OSC_CONSOLE = oscc in docs)
+              add recompile script for controlP5 library
+              minor code changes to oscc.pde to compile in Processing v2.x
+              add experimental single-file executable (linux only)
+
+20130118
+v0.6          add startupHook() and shutdownHook()
+              these methods (in oscc_scripts.js) are called on oscc 
+              startup and oscc shutdown. this should make it possible 
+              to trigger anything on start/stop of oscc.
+
+              add --help (=help)
+
+              add simple poller to be used from JavaScript:
+              -> setPoller(host,port,osccommand,interval);  
+              -> setPoller('localhost',7777,'/hello;s;there',500);
+
+              Stop/remove the poller: 
+              -> destroyPoller();
+
+              Only one poller can be used at the moment.
+
+20121111
+v0.51         bug fix for js actions with pass mask 01
+
+              first bit of pass mask is now pattern,host,port
+              (added port)
+
+              add oscc API function runCmd to use from JavaScript
+              -> runCmd('xmessage hello &');
+              no output is returned back to JavaScript
+
+              note: native commands (via actions, JavaScript)
+              are blocking, unless started with &
+
+              unsolved known issues: 
+              -> Alt+Gr crashes OSC_CONSOLE
+              -> textfields do not adapt to large text sizes
+
+20121106
+v0.5          rudimentary message/key/value store for external processes
+
+              to store 42 with key /my/value:
+              -> //set/my/value i 2 
+
+              to retrieve key /my/value:
+              -> //get/my/value 
+
+              store multi-value object:
+              -> //set/my/object sif "foo" 1 2.3 
+
+              JavaScript (ECMA) support from console:
+              -> js:println('hello world')
+              -> js:my_loaded_function_from_oscc_scripts.js(42)
+
+              JavaScript (ECMA) support for actions in oscc_actions.csv:
+              -> /react/on/this;my_loaded_function();11
+              
+              see data/oscc_scripts.js for examples on how to send OSC messages etc
+
+              Run native commands from console (no output to console):
+              -> local:<command>
+              -> local:my_test_script.sh
+
+              Set font size from cmd line, set from console with 
+              -> fontsize:<size>
+
+              log prefixes for better grep support
+
+              small fixes / optimizations
+
+              see help for more
+
+20121102
+v0.4          handling of 'port already in use' situations
+              -> will probe on next available
+              -> allowing multiple instances without the use of cmd args
+
+              'inject' messages to OSC_CONSOLE from external processes for resend
+              -> OSC message '//send/hi/there siii 10.10.10.20 1234 1 2' to OSC_CONSOLE
+              will send '/hi/there ii 1 2' from host and port used by 
+              OSC_CONSOLE to 10.10.10.20 1234
+
+              through the use of //send, external scripts can use
+              OSC_CONSOLE as a relay. this can be helpful depending 
+              on the interaction scenario of involved nodes.
+
+20121101
+v0.3          support for actions/triggers/hooks in data/oscc_actions.csv
+              see comments in data/oscc_actions.csv
+              -> attach an action to incoming OSC messages if conditions met
+              -> run action on localhost (native command, script)
+              this allows to build an OSC behaviour through the use
+              of the scripting language you like
+              this is only for building up quick & dirty prototypes or
+              to do OSC unit testing but not for high-throughput applications
+
+20121031
+v.02          basic test working on linux,win32,mac
+              log autoflush
+
+20121029
+v.01          initial test release
