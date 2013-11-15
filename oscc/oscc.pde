@@ -166,12 +166,15 @@ void setup()
     if (args.length>=4)
     {
       sFontName=args[3];
-      fontSize=Integer.parseInt(args[4]);
+      if(args.length>=5)
+      {
+        fontSize=Integer.parseInt(args[4]);
+      }
     }
   }
   catch(Exception e)
   {
-    println("here"+e.getMessage());
+    println("error: "+e.getMessage());
     exit2();
   }
 
