@@ -11,6 +11,11 @@
 # 2) start ./oscc
 # 3) clean up
 
+#own port, remote host, remote port
+CMD_ARGS="10001 127.0.0.1 10001" 
+################################
+#CMD_ARGS="help"
+
 #generic bskt
 ##########################################
 
@@ -46,7 +51,7 @@ mainMethod()
 	tar xfz oscc_*
 
 	cd oscc_*
-	./oscc
+	./oscc $CMD_ARGS
 
 	echo ""
 	echo -n "cleaning up..."
