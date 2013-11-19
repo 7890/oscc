@@ -70,8 +70,9 @@ How to run native (platform-specific) commands
 
 How to trig actions on messages matching XYZ
 
-See comments in file data/oscc_actions.csv on how to hook up actions to incoming OSC messages.
-With actions, you can run native commands on your platform or trigger JavaScript functions.
+See comments in file data/oscc_actions.csv on how to hook up actions 
+to incoming OSC messages. With actions, you can run native commands on 
+your platform or trigger JavaScript functions.
 
 How to evaluate JavaScript from the console:
 
@@ -96,8 +97,9 @@ JavaScript must comply to ECMA (without object 'window' etc.)
 
 How to use oscc for setting/getting status information:
 
-Basically the JavaScript context can be used for that. But you can also store OSC messages directly.
-An OSC message with it's pattern and arguments is a good container to store small, structured information like status.
+Basically the JavaScript context can be used for that. But you can also 
+store OSC messages directly. An OSC message with it's pattern and arguments 
+is a good container to store small, structured information like status.
 External processes can store and retrieve OSC messages in oscc.
 
    //set/my/struct/as/osc/msg;sif;a string;1;2.3
@@ -139,5 +141,84 @@ Console log prefixes:
    GTM: get message from store (//get)
    CMD: native command
    ERR: error
+
+```
+
+```
+#data/oscc_actions.csv:
+
+#configuration file for OSC_CONSOLE
+#entries share the following syntax:
+#pattern;action;passparams
+
+#hash and semicolon are comment characters
+
+#action will be called with 
+#/bin/sh (unix compat.) or cmd.exe (windows)
+
+#params:
+#select which params to pass to action with bitmask
+#00 or empty: no params are passed
+#first bit: oscpattern and ip address and port of sender
+#second bit: available osc arguments
+#10: oscpattern, from-ip, from-port (i.e. /bus1/test1 /10.10.10.38 1234)
+#01: all arguments (i.e. 42 "hello world" 14.3)
+#11: everything in the order 
+#/my/oscpattern, from-ip, from-port, arg1, arg2, ...
+
+#if action is a script, it must have executable flag set
+#chmod 775 /tmp/my.sh
+#scrtpt uri should be fully qualified starting with /..
+#or c:\ respectively
+
+;/bus1/test1;/tmp/my.sh;01
+;/bus1/test2;/tmp/my.sh;10
+
+#regular expression support to match osc pattern:
+#  *: match anything
+#  +: match anything up to next /
+#  ?: match any single char
+#  #: match any sequence of digits
+#  examples: 
+#  /hell* would match /hello, /helloworld,
+#  /hello/world/xyz etc.
+#  /hell+ would match /hello, /helluva, etc.
+#  /a/+ would match /a/b, /a/xyz etc.
+#  /a/+/c would match /a/b/c, /a/xyz/c, etc.
+#  /a/*/c would match /a/b/c, /a/x/y/z/c etc.
+#  /#/+/? would match /123/anything/a, /1/a/b etc.
+
+;/a+/b+;/tmp/my.sh;11
+;/#/?/+/*;/tmp/my.sh;11
+;/start/prog;notepad.exe;01
+;/hello/mac;open /Applications/TextEdit.app;00
+;/gugus;oscsend localhost 10001 /foo i 42;00
+
+;/ping;/tmp/non-existing.sh;11
+/ping;send_pong_to();10
+
+#...
+```
+
+```
+#oscc_scripts.js:
+
+#...
+
+/*wrappers for calls to exposed functions from oscc*/
+/*send osc message. message syntax like in OSC_CONSOLE*/
+function send(host,port,message)
+{
+        oscc.send(host,port,message);
+}
+
+#...
+
+function send_pong_to(pattern,host,port)
+{
+        send(host,port,'/pong');
+}
+
+#...
 
 ```
