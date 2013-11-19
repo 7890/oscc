@@ -201,24 +201,52 @@ Console log prefixes:
 ```
 
 ```
-#oscc_scripts.js:
+/*oscc_scripts.js:*/
 
-#...
+/*...*/
 
 /*wrappers for calls to exposed functions from oscc*/
-/*send osc message. message syntax like in OSC_CONSOLE*/
+/*send osc message. message syntax like in oscc*/
 function send(host,port,message)
 {
         oscc.send(host,port,message);
 }
 
-#...
+/*print to oscc*/
+function p(s)
+{
+        oscc.p(s);
+}
+
+/*get message from store*/
+function get(s)
+{
+        return oscc.get(s);
+}
+
+/*...*/
 
 function send_pong_to(pattern,host,port)
 {
         send(host,port,'/pong');
 }
 
-#...
+/*...*/
+
+/*when this method is available, it will be called when oscc is ready after startup*/
+function startupHook()
+{
+        p("startupHook called");
+        send('127.0.0.1',10001,'/oscc/up');
+}
+
+/*when this method is available, it will be called when oscc is about to quit*/
+function shutdownHook()
+{
+        p("shutdownpHook called");
+        send('127.0.0.1',10001,'/oscc/down');
+}
+
+/*...*/
 
 ```
