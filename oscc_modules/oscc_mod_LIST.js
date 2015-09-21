@@ -1,5 +1,7 @@
 /*module 'LIST' for oscc
 browse and select items on touchosc device
+put this file to subfolder 'modules' in folder 'data'
+load from main oscc_scripts.js with loadJavaScript('modules/oscc_mopd_LIST.js');
 //tb/150917
 */
 
@@ -14,6 +16,28 @@ oscsend localhost 10001 /LIST/append s '"c","d","test me"'
 /*=========================================================*/
 
 /*
+add to oscc_actions.csv (example):
+
+#touchosc
+/1/btns/1/1;LIST.first_page();11
+/1/btns/1/2;LIST.prev_page();11
+/1/btns/1/3;LIST.next_page();11
+/1/btns/1/4;LIST.locate_selection();11
+
+/1/li/0/bt;LIST.item_touched();11
+/1/li/1/bt;LIST.item_touched();11
+/1/li/2/bt;LIST.item_touched();11
+/1/li/3/bt;LIST.item_touched();11
+
+#other
+/LIST/add;LIST.add();11
+/LIST/append;LIST.append();11
+
+/select_item;LIST.select_highlighted_item();11
+/prev_item;LIST.highlight_prev_item();11
+/next_item;LIST.highlight_next_item();11
+
+
 TouchOsc Interface Description
 
 send to device:
