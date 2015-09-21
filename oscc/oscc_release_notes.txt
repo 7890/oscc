@@ -1,5 +1,14 @@
 oscc (OSC Console) Release History
 
+20150917      add 'loadJavaScript(file)' to JS context (oscc. from oscc_actions.js), 
+v0.71         similar to #include in C -> allow to split large script files. allow 
+              loading of script created by another process.
+
+              add 'enable_print'/'ep' and 'disable_print'/'dp' as console commands
+              -> if a lot of traffic is going from or to oscc, the console text windows 
+              comes to its limits quite quickly. -> turning off will still process as 
+              normal but not clutter the console.
+
 20131115
 v0.7          clean up oscc to release on github
               change (sketch) name from OSC_CONSOLE to oscc

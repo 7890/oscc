@@ -9,22 +9,22 @@ public class OSCRegexMatcher
   public static void main(String[] args) 
   {
     OSCRegexMatcher regex=new OSCRegexMatcher();
-    System.out.println(regex.isMatch(args[0], args[1]));
-    System.out.println(regex.isMatchSimple(args[0], args[1]));
+    System.out.println(regex.isMatch(args[0], args[1], true));
+    System.out.println(regex.isMatchSimple(args[0], args[1], true));
   }
 
   public OSCRegexMatcher()
   {
   }
 
-  public boolean isMatch(String sInput, String sPattern)
+  public boolean isMatch(String sInput, String sPattern, boolean verbose)
   {
     Pattern pattern = Pattern.compile(sPattern, Pattern.CASE_INSENSITIVE);
     Matcher matcher = pattern.matcher(sInput);
 
     boolean ret=matcher.matches();
 
-    if (ret)
+    if(ret && verbose)
     {
       System.out.println("OSCRegexMatcher: This Pattern matched: "+sPattern);
     }
@@ -32,7 +32,7 @@ public class OSCRegexMatcher
     return ret;
   }
 
-  public boolean isMatchSimple(String sInput, String sPattern)
+  public boolean isMatchSimple(String sInput, String sPattern, boolean verbose)
   {
     //replace *
     Pattern replace = Pattern.compile("[*]");
@@ -47,7 +47,7 @@ public class OSCRegexMatcher
     matcher = replace.matcher(sPatternExtended2);
     sPatternExtended=matcher.replaceAll("[a-zA-Z0-9-]");
 
-    return isMatch(sInput, sPatternExtended);
+    return isMatch(sInput, sPatternExtended, verbose);
   }
 } //end class OSCRegexMatcher
 

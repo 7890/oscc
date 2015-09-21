@@ -18,7 +18,9 @@ in generated start script after export, add $@ at end to pass params to applet
 for maxosx, add $JAVAROOT to classpath in plist file
 
 known issues
-alt gr provoces exception. don't press it :)
+-alt gr provoces exception. don't press it :)
+-THIS PROGRAM CAN BE A SECURITY RISK IF NOT PROPERLY CONFIGURED AND USED
+-KNOW WHAT YOU ARE DOING AND SECURE YOUR NETWORK TO AVOID MALICIOUS USE
 */
 
 import controlP5.*;
@@ -37,7 +39,7 @@ ControlP5 cp5;
 OscP5 oscP5;
 OscProperties properties;
 
-String sVersion="0.7";
+String sVersion="0.71";
 
 int osc_server_port=10001;
 String send_to_host="127.0.0.1";
@@ -64,8 +66,15 @@ float oldHeight;
 
 TrashCollector ts;
 
+//osc processing
 boolean is_enabled=true;
 boolean is_paused=false;
+
+//suppress anything that would print to console
+//due to the nature of the console, a lot of message will
+//make it very slow. "cl" will clear it
+//for known traffic intensive things printing can be turned off
+boolean is_print_enabled=true;
 
 boolean is_log_enabled=false;
 boolean is_log_append=true;
@@ -440,6 +449,17 @@ void draw()
 //===========================================================
 void p_(Object o)
 {
+  if (is_log_enabled && pwriter!=null)
+  {
+    pwriter.println(year()+month_()+day_()+" "+hour_()+":"+minute_()+":"+second_()+" "+o);
+    pwriter.flush();
+  }
+
+  if(!is_print_enabled)
+  {
+    return;
+  }
+  
   txt_lines_count++;
   if (txt_lines_count>=txt_max_lines)
   {
@@ -447,12 +467,6 @@ void p_(Object o)
     console.clear();
   }
   println(hour_()+":"+minute_()+":"+second_()+" "+o);
-
-  if (is_log_enabled && pwriter!=null)
-  {
-    pwriter.println(year()+month_()+day_()+" "+hour_()+":"+minute_()+":"+second_()+" "+o);
-    pwriter.flush();
-  }
 }
 
 String month_()
@@ -556,19 +570,21 @@ void showHelp()
 
   sb.append("Built-in commands without arguments:"+sLineEnd);
   sb.append(sLineEnd);  
-  sb.append("   clear    cl:   clear console"+sLineEnd); 
+  sb.append("   clear         cl:   clear console"+sLineEnd); 
   //sb.append("  pause    pa:   no output to console"+sLineEnd);
   //sb.append("  play     pl:   output to console"+sLineEnd);
-  sb.append("   disable  di:   do not process incoming OSC messages"+sLineEnd);
-  sb.append("   enable   en:   process incoming OSC messages"+sLineEnd);  
-  sb.append("   log      lo:   start logging to file"+sLineEnd);  
-  sb.append("   nolog    nl:   stop logging to file"+sLineEnd);
-  sb.append("   reload   rl:   reload actions configuration file"+sLineEnd);
-  sb.append("   reloadjs rj:   reload JavaScript file"+sLineEnd);  
-  sb.append("   info     in:   show info on status (enabled/disabled etc.)"+sLineEnd);  
-  sb.append("   about    ab:   additional info"+sLineEnd);
-  sb.append("   quit      q:   quit"+sLineEnd);  
-  sb.append("   help      h:   this help text"+sLineEnd);
+  sb.append("   disable       di:   do not process incoming OSC messages"+sLineEnd);
+  sb.append("   enable        en:   process incoming OSC messages"+sLineEnd);
+  sb.append("   disable_print dp:   do not print anything to console"+sLineEnd);
+  sb.append("   enable_print  ep:   print to console what's going on"+sLineEnd);  
+  sb.append("   log           lo:   start logging to file"+sLineEnd);  
+  sb.append("   nolog         nl:   stop logging to file"+sLineEnd);
+  sb.append("   reload        rl:   reload actions configuration file"+sLineEnd);
+  sb.append("   reloadjs      rj:   reload JavaScript file"+sLineEnd);  
+  sb.append("   info          in:   show info on status (enabled/disabled etc.)"+sLineEnd);  
+  sb.append("   about         ab:   additional info"+sLineEnd);
+  sb.append("   quit           q:   quit"+sLineEnd);  
+  sb.append("   help           h:   this help text"+sLineEnd);
   sb.append(sLineEnd);
 
   sb.append("How to set size of console font:"+sLineEnd);
@@ -848,7 +864,7 @@ void controlEvent(ControlEvent ev)
       }
       else if (s.equals("disable") || s.equals("di"))
       {
-        p_("CNF: disabling processing of incoming osc messages");
+        p_("CNF: disabling processing of incoming osc messages ('en' to enable again)");
         is_enabled=false;
       }
       else if (s.equals("enable") || s.equals("en"))
@@ -856,6 +872,17 @@ void controlEvent(ControlEvent ev)
         p_("CNF: enabling processing of incoming osc messages");
         is_enabled=true;
       }
+      else if (s.equals("disable_print") || s.equals("dp"))
+      {
+        p_("CNF: disabling printing to console ('ep' to enable again)");
+        is_print_enabled=false;
+      }
+      else if (s.equals("enable_print") || s.equals("ep"))
+      {
+        is_print_enabled=true;
+        p_("CNF: enabling printing to console");
+      }
+      
       /*
       else if (s.equals("pause") || s.equals("pa"))
        {
@@ -1068,20 +1095,18 @@ void send_osc(String host, int port, String s)
 
 private void triggerAllFor(OscMessage msg)
 {
-
   String spat=msg.addrPattern();
   //for (int i=0;i<vActions.size();i++)
   for (OSCAction oa : vActions)
   {
     //OSCAction oa=(OSCAction)vActions.elementAt(i);
 
-    if (regex.isMatch(spat, oa.getPattern()))
+    if (regex.isMatch(spat, oa.getPattern(),is_print_enabled))
     {
       //regex will print out used match pattern
       String sCmd=oa.getAction();
 
       Object[] args=msg.arguments();
-
 
       if (oa.getType()==0)
       {
@@ -1351,6 +1376,11 @@ public class OSCC_API
   public void send(String host, int port, String msg)
   {
     send_osc(host, port, msg);
+  }
+  public void loadJavaScript(String s)
+  {
+    p_("LDJ: "+s);
+    js_eval(getAsString(s));    
   }
   public Object[] get(String pat)
   {

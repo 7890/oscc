@@ -17,6 +17,12 @@ function p(s)
 	oscc.p(s);
 }
 
+/*new*/
+function loadJavaScript(s)
+{
+	oscc.loadJavaScript(s);
+}
+
 /*get message from store*/
 function get(s)
 {
